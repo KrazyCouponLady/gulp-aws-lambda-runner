@@ -1,5 +1,6 @@
 var map = require('map-stream'),
 	fs = require('fs'),
+	util = require('util'),
 	FS = require('q-io/fs');
 
 module.exports = function(eventFileName) {

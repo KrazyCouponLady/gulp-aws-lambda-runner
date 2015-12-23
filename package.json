@@ -1,0 +1,26 @@
+{
+  "name": "gulp-aws-lambda-runner",
+  "version": "1.0.0",
+  "description": "A gulp plugin for executing an AWS lambda module locally",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KrazyCouponLady/gulp-aws-lambda-runner.git"
+  },
+  "keywords": [
+    "gulpplugin"
+  ],
+  "author": "krazy.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KrazyCouponLady/gulp-aws-lambda-runner/issues"
+  },
+  "homepage": "https://github.com/KrazyCouponLady/gulp-aws-lambda-runner#readme",
+  "dependencies": {
+    "map-stream": "0.0.6",
+    "q-io": "^1.13.2"
+  }
+}

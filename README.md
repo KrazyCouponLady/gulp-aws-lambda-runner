@@ -22,7 +22,6 @@ A sample workflow:
 |   +-- MyLambda
 |       +-- MyLambda.js
 |       +-- event.json
-|       +-- package.json
 ```
 
 The following task could be used to execute a module in the above workflow.

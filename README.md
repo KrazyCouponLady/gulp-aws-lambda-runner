@@ -38,7 +38,7 @@ gulp.task('run', function(cb) {
 		eventName = argv.event || 'event.json';
 
 	if (!specificLambda) {
-		return cb('[Aborting] Missing parameter: --labmda={NAME}');
+		return cb('[Aborting] Missing parameter: --lambda={NAME}');
 	}
 
 	return gulp.src(path.join(__dirname, 'src/', specificLambda, '*'))

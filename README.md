@@ -1,6 +1,6 @@
 ## Intro
 
-While working with Nodejs modules that are intended to be AWS Lambdas, it's c0nvenient to execute the module without having to publish to AWS first.
+While working with Nodejs modules that are intended to be AWS Lambdas, it's convenient to execute the module without having to publish to AWS first.
 
 
 ## Installation
@@ -12,9 +12,9 @@ Install package with NPM, and add it to your development dependencies:
 ## Usage
 A sample workflow:
 
-1) Lambda modules are in separate folders.
-2) The folder names are the lambda module names.
-3) Sample events are included in the module (such as event.json).
+* Lambda modules are in separate folders.
+* The folder names are the lambda module names.
+* Sample events are included in the module (such as event.json).
 
 ```.
 +-- gulpfile.js

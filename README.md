@@ -28,20 +28,20 @@ The following task could be used to execute a module in the above workflow.
 
 ```
 var gulp = require('gulp'),
-	path = require('path'),
-	argv = require('yargs').argv,
-	runner = require('gulp-aws-lambda-runner');
+    path = require('path'),
+    argv = require('yargs').argv,
+    runner = require('gulp-aws-lambda-runner');
     
 gulp.task('run', function(cb) {
-	var specificLambda = argv.lambda,
-		eventName = argv.event || 'event.json';
+    var specificLambda = argv.lambda,
+        eventName = argv.event || 'event';
 
-	if (!specificLambda) {
-		return cb('[Aborting] Missing parameter: --lambda={NAME}');
-	}
+    if (!specificLambda) {
+        return cb('[Aborting] Missing parameter: --lambda={NAME}');
+    }
 
-	return gulp.src(path.join(__dirname, 'src/', specificLambda, '*'))
-			.pipe(runner(eventName));
+    return gulp.src(path.join(__dirname, 'src/', specificLambda, '*'))
+               .pipe(runner({ eventFileName : eventName + '.json' }))
 });
 ```
 
@@ -52,7 +52,8 @@ The return result from executing a lambda locally with the gulp-aws-lambda-runne
 
 ```
 $ gulp run --lambda=MyLambda
-... 
+[08:13:42] Using gulpfile /path/gulpfile.js
+[08:13:42] Starting 'run'...
 Using handler found at /path/src/MyLambda/MyLambda.js
 Using configured test event /path/src/MyLambda/event.json
 

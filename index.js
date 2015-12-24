@@ -3,25 +3,33 @@ var map = require('map-stream'),
 	util = require('util'),
 	FS = require('q-io/fs');
 
-module.exports = function(eventFileName) {
+module.exports = function(options) {
 
-	eventFileName = eventFileName || 'event.json';
+	options = options || {};
 
 	return map(function(vinyl, callback) {
 		FS.listTree(vinyl.path, function(path, stat){
 			return path.indexOf('node_modules') == -1 && /\.(js|json)$/.test(path);
 		})
 		.then(function(file) {
-			if (this.executed) {
+			var path = file[0];
+
+			if (this.executed || !path) {
 				return callback(null, vinyl);
 			}
 
-			var path = file[0];
-			if (path.indexOf(eventFileName) > -1) {
-				console.log('Using configured test event ' + path);
-				this.eventData = JSON.parse(fs.readFileSync(path).toString());
+
+			if (typeof this.eventData == 'undefined') {
+				if (typeof options.eventData != 'undefined') {
+					this.eventData == options.eventData;
+				}
+				else if (typeof options.eventFileName != 'undefined' && path.indexOf(options.eventFileName) > -1) {
+					console.log('Using configured test event ' + path);
+					this.eventData = JSON.parse(fs.readFileSync(path).toString());
+				}
 			}
-			else if (typeof this.handler == 'undefined') {
+
+			if (typeof this.handler == 'undefined' && path.substr(-3) == '.js') {
 				var module = require(path);
 				if (module.handler) {
 					console.log('Using handler found at ' + path);
@@ -31,6 +39,7 @@ module.exports = function(eventFileName) {
 
 			if ((typeof this.eventData != 'undefined') && (typeof this.handler != 'undefined')) {
 				console.time('Execution');
+				console.log('\n');
 
 				var context = {
 					fail: function(err) {
@@ -44,6 +53,7 @@ module.exports = function(eventFileName) {
 						else {
 							console.log(util.inspect(data));
 						}
+						console.log('\n');
 						console.timeEnd('Execution');
 						if (Array.isArray(data)) {
 							console.log('Returned ' + data.length + ' rows');
@@ -69,3 +79,4 @@ module.exports = function(eventFileName) {
 		});
 	});
 };
+

@@ -4,7 +4,7 @@
   "description": "A gulp plugin for executing an AWS lambda module locally",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",

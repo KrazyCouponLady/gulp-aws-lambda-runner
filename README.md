@@ -46,20 +46,15 @@ gulp.task('run', function(cb) {
 ```
 
 ### Example Output
-The return result from executing a lambda locally with the gulp-aws-lambda-runner plugin includes the data from ```context.done(err, data)``` and the execution time in milliseconds.
+The return result from executing a Lambda module locally with the gulp-aws-lambda-runner plugin includes the data from ```context.done(err, data)``` and the Lambda handler execution time in milliseconds.
 
 ```
 $ gulp run --lambda=MyLambda
-[08:13:42] Using gulpfile /path/gulpfile.js
-[08:13:42] Starting 'run'...
-Using handler found at /path/src/MyLambda/MyLambda.js
-Using configured test event /path/src/MyLambda/event.json
-
-{
-  // stringified array, object or primitve
-}
-  
-Execution: 317ms
+[13:40:45] Using gulpfile /path/to/gulpfile.js
+[13:40:45] Starting 'run'...
+[13:40:45] { data: "Success" }
+[13:40:45] Execution: 335ms
+[13:40:45] Finished 'run' after 357 ms
 ```
 
 ## LICENSE

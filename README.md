@@ -41,11 +41,9 @@ gulp.task('run', function(cb) {
     }
 
     return gulp.src(path.join(__dirname, 'src/', specificLambda, '*'))
-               .pipe(runner({ eventFileName : eventName + '.json' }))
+               .pipe(runner({ eventFileName : eventName + '.json' }));
 });
 ```
-
-
 
 ### Example Output
 The return result from executing a lambda locally with the gulp-aws-lambda-runner plugin includes the data from ```context.done(err, data)``` and the execution time in milliseconds.

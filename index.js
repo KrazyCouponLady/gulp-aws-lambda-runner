@@ -16,7 +16,7 @@ module.exports = function(options) {
 
 	function read(vinylFile, enc, cb) {
 		if (vinylFile.path.indexOf('node_modules') > -1 || !(/\.(js|json)$/.test(vinylFile.path))) {
-			return;
+			return cb(null, vinylFile);
 		}
 
 		if (runner.handler == null && vinylFile.path.substr(-3) == '.js') {

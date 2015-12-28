@@ -47,10 +47,10 @@ module.exports = function(options) {
 			},
 			succeed : function(data) {
 				if (typeof data == 'string') {
-					gutil.log(gutil.colors.cyan(data));
+					gutil.log(gutil.colors.gray(data));
 				}
 				else {
-					gutil.log(gutil.colors.cyan(util.inspect(data)));
+					gutil.log(gutil.colors.gray(util.inspect(data)));
 				}
 				gutil.log(gutil.colors.magenta('Execution: ' + (new Date().getTime() - startingTime) + 'ms'));
 				if (Array.isArray(data)) {

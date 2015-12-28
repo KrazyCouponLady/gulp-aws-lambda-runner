@@ -1,83 +1,76 @@
 var through = require('through2'),
-	fs = require('fs'),
-	util = require('util'),
-	FS = require('q-io/fs');
+	gutil = require('gulp-util'),
+	PluginError = gutil.PluginError,
+	requireFromString = require('require-from-string'),
+	util = require('util');
 
 module.exports = function(options) {
 
 	options = options || {};
 
-	var runner = {
-		handler : null,
-		eventData : options.eventData || {}
-	};
+	var PLUGIN_NAME = 'gulp_aws_lambda_runner',
+   		runner = {
+			handler : null,
+			eventData : options.eventData || {}
+		};
 
 	function read(vinylFile, enc, cb) {
-		var filePath = vinylFile.path;
+		if (vinylFile.path.indexOf('node_modules') > -1 || !(/\.(js|json)$/.test(vinylFile.path))) {
+			return;
+		}
 
-		FS.listTree(filePath, function(currentPath, stat){
-			return currentPath.indexOf('node_modules') == -1 && /\.(js|json)$/.test(currentPath);
-		})
-		.then(function(currentFile) {
-			var files = [].concat(currentFile);
-			for (var i = 0, length = files.length; i < length; i++) {
-				var currentFilePath = files[0];
-				if (runner.handler == null && currentFilePath.substr(-3) == '.js') {
-					var module = require(currentFilePath);
-					if (module.handler) {
-						runner.handler = module.handler;
-					}
-				}
-				else if (typeof options.eventFileName != 'undefined' && currentFilePath.indexOf(options.eventFileName) > -1) {
-					runner.eventData = JSON.parse(fs.readFileSync(currentFilePath).toString());
-				}
+		if (runner.handler == null && vinylFile.path.substr(-3) == '.js') {
+			var module = requireFromString(vinylFile.contents.toString());
+			if (typeof module.handler == 'function') {
+				runner.handler = module.handler;
 			}
-			cb(null, vinylFile);
-		});
-	};
+		}
+		else if (typeof options.eventFileName != 'undefined' && vinylFile.path.indexOf(options.eventFileName) > -1) {
+			runner.eventData = JSON.parse(vinylFile.contents.toString());
+		}
+		return cb(null, vinylFile);
+	}
 
 	function end(cb) {
 		var err = null;
 		if (typeof runner.handler != 'function') {
-			err = '[ABORT] No handler found in the supplied modules';
-			cb(err);
+			throw new PluginError(PLUGIN_NAME, 'No handler found in the supplied modules');
 		}
-		else {
-			console.time('Execution');
-			console.log('\n');
 
-			var context = {
-				fail: function(err) {
-					console.timeEnd('Execution');
-					cb(err);
-				},
-				succeed : function(data) {
-					if (typeof data == 'string') {
-						console.log(data);
-					}
-					else {
-						console.log(util.inspect(data));
-					}
-					console.log('\n');
-					console.timeEnd('Execution');
-					if (Array.isArray(data)) {
-						console.log('Returned ' + data.length + ' rows');
-					}
-					cb();
-				}
-			};
+		var startingTime = new Date().getTime();
 
-			context.done = function (err, data) {
-				if (err) {
-					context.fail(err);	
+		var context = {
+			fail: function(err) {
+				gutil.log('Execution: ' + (new Date().getTime() - startingTime) + 'ms');
+				gutil.beep();
+				throw new PluginError(PLUGIN_NAME, err, {showStack: true});
+			},
+			succeed : function(data) {
+				if (typeof data == 'string') {
+					gutil.log(gutil.colors.cyan(data));
 				}
 				else {
-					context.succeed(data);
+					gutil.log(gutil.colors.cyan(util.inspect(data)));
 				}
-			};
+				gutil.log(gutil.colors.magenta('Execution: ' + (new Date().getTime() - startingTime) + 'ms'));
+				if (Array.isArray(data)) {
+					gutil.log('Returned ' + data.length + ' rows');
+				}
+				gutil.beep();
+				return cb();
+			}
+		};
 
-			runner.handler(runner.eventData, context);
-		}
+		context.done = function (err, data) {
+			if (err) {
+				context.fail(err);	
+			}
+			else {
+				context.succeed(data);
+			}
+		};
+
+		runner.handler(runner.eventData, context);
 	}
 
 	return through.obj(read, end);

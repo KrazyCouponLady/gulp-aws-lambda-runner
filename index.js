@@ -1,7 +1,7 @@
 var through = require('through2'),
 	gutil = require('gulp-util'),
 	PluginError = gutil.PluginError,
-	requireFromString = require('require-from-string'),
+	path = require('path'),
 	util = require('util');
 
 module.exports = function(options) {
@@ -14,21 +14,21 @@ module.exports = function(options) {
 			eventData : options.eventData || {}
 		};
 
-	function read(vinylFile, enc, cb) {
-		if (vinylFile.path.indexOf('node_modules') > -1 || !(/\.(js|json)$/.test(vinylFile.path))) {
-			return cb(null, vinylFile);
+	function read(file, enc, cb) {
+		if (file.path.indexOf('node_modules') > -1 || !(/\.(js|json)$/.test(file.path))) {
+			return cb(null, file);
 		}
 
-		if (runner.handler == null && vinylFile.path.substr(-3) == '.js') {
-			var module = requireFromString(vinylFile.contents.toString());
-			if (typeof module.handler == 'function') {
-				runner.handler = module.handler;
+		if (file.path.substr(-3) == '.js') {
+			var m = require(file.path);
+			if (typeof m.handler == 'function') {
+				runner.handler = m.handler;
 			}
 		}
-		else if (typeof options.eventFileName != 'undefined' && vinylFile.path.indexOf(options.eventFileName) > -1) {
-			runner.eventData = JSON.parse(vinylFile.contents.toString());
+		else if (typeof options.eventFileName != 'undefined' && file.path.indexOf(options.eventFileName) > -1) {
+			runner.eventData = JSON.parse(file.contents.toString());
 		}
-		return cb(null, vinylFile);
+		return cb(null, file);
 	}
 
 	function end(cb) {
@@ -37,7 +37,13 @@ module.exports = function(options) {
 			throw new PluginError(PLUGIN_NAME, 'No handler found in the supplied modules');
 		}
 
-		var startingTime = new Date().getTime();
+		var startingTime = new Date().getTime(),
+			handler = this;
+
+		function _cb() {
+			handler.emit('end');
+			cb();
+		}
 
 		var context = {
 			fail: function(err) {
@@ -57,7 +63,7 @@ module.exports = function(options) {
 					gutil.log('Returned ' + data.length + ' rows');
 				}
 				gutil.beep();
-				return cb();
+				return _cb();
 			}
 		};
 
@@ -75,4 +81,3 @@ module.exports = function(options) {
 
 	return through.obj(read, end);
 };
-

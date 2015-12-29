@@ -1,6 +1,5 @@
 var assert = require('assert'),
-	File = require('vinyl'),
-	handlerFactory = require('./handler.fixture.js'),
+	vfs = require('vinyl-fs'),
 	awsLambdaRunner = require('../index');
 
 describe('gulp-aws-lambda-runner', function() {
@@ -20,10 +19,17 @@ describe('gulp-aws-lambda-runner', function() {
 
 	describe('using a single file workflow', function() {
 		it('should find valid handler', function(done) {
-			var actual = awsLambdaRunner({eventData:{}});
-			actual.write(handlerFactory());
-			actual.end();
-			done();
+			vfs.src('./test/handler.stub.js')
+				.pipe(awsLambdaRunner({eventData:{}}))
+				.on('end', done);
+		});
+	});
+
+	describe('including local dependencies', function() {
+		it('should resolve those dependencies (https://github.com/KrazyCouponLady/gulp-aws-lambda-runner/issues/1)', function(done) {
+			vfs.src('./test/handler.with.dependency.stub.js')
+				.pipe(awsLambdaRunner({eventData:{}}))
+				.on('end', done);
 		});
 	});
 });

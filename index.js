@@ -40,15 +40,14 @@ module.exports = function(options) {
 		var startingTime = new Date().getTime(),
 			handler = this;
 
-		function _cb() {
-			handler.emit('end');
-			cb();
-		}
-
 		var context = {
 			fail: function(err) {
+				if (typeof err == 'string') {
+					err = new Error(err);
+				}
 				gutil.log('Execution: ' + (new Date().getTime() - startingTime) + 'ms');
 				gutil.beep();
+				handler.emit('error', err);
 				throw new PluginError(PLUGIN_NAME, err, {showStack: true});
 			},
 			succeed : function(data) {
@@ -63,7 +62,10 @@ module.exports = function(options) {
 					gutil.log('Returned ' + data.length + ' rows');
 				}
 				gutil.beep();
-				return _cb();
+				return (function() {
+					handler.emit('end');
+					cb();
+				})();
 			}
 		};
 

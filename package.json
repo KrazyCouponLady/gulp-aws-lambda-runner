@@ -1,6 +1,6 @@
 {
   "name": "gulp-aws-lambda-runner",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A Gulp plugin for executing an AWS Lambda module locally",
   "main": "index.js",
   "scripts": {

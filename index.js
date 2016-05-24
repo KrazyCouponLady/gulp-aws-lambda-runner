@@ -8,7 +8,7 @@ module.exports = function(options) {
 
 	options = options || {};
 
-	var PLUGIN_NAME = 'gulp_aws_lambda_runner',
+	var PLUGIN_NAME = 'gulp-aws-lambda-runner',
    		runner = {
 			handler : null,
 			eventData : options.eventData || {}
@@ -78,8 +78,18 @@ module.exports = function(options) {
 			}
 		};
 
-		runner.handler(runner.eventData, context);
+        var callback = function(err, result) {
+            if (err) {
+                context.fail(err);
+            }
+            else {
+                context.succeed(result);
+            }
+        }
+
+		runner.handler(runner.eventData, context, callback);
 	}
 
 	return through.obj(read, end);
 };
+

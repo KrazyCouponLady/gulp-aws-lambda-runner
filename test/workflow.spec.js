@@ -32,7 +32,7 @@ describe('gulp-aws-lambda-runner', function() {
 			.on('end', done);
 	});
 
-	it('should resolve localt dependencies (https://github.com/KrazyCouponLady/gulp-aws-lambda-runner/issues/1)', function(done) {
+	it('should resolve local dependencies (https://github.com/KrazyCouponLady/gulp-aws-lambda-runner/issues/1)', function(done) {
 		vfs.src('./test/handler.with.dependency.stub.js')
 			.pipe(awsLambdaRunner({eventData:{}}))
 			.on('end', done);
